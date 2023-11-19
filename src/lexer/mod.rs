@@ -69,7 +69,7 @@ impl Lexer {
             if c.is_whitespace() {
                 if c == '\n' {
                     self.line += 1;
-                    self.line_start_column = i;
+                    self.line_start_column = i + 1;
                 }
                 continue;
             }
@@ -135,5 +135,51 @@ impl Lexer {
         }
 
         tokens
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::lexer::token::TokenType::*;
+
+    use super::*;
+
+    #[test]
+    fn test_single_tokens() {
+        let token_types = [
+            LeftParen, RightParen, LeftBrace, RightBrace, Minus, Plus, Star, Slash, Colon,
+            Semicolon, ExclMark, ExclMarkEqual, Equal, EqualEqual, Greater, GreaterEqual,
+            Less, LessEqual, Def, Identifier(String::from("asd")), Number(5),
+        ];
+        let lexemes = [
+            "(", ")", "{", "}", "-", "+", "*", "/", ":",
+            ";", "!", "!=", "=", "==", ">", ">=",
+            "<", "<=", "def", "asd", "5",
+        ];
+
+        for (token_type, lexeme) in token_types.into_iter().zip(lexemes.into_iter()) {
+            let lexer = Lexer::default();
+            let expected = Token { typ: token_type, line: 0, column: 0 };
+            let actual = lexer.tokenize(lexeme);
+
+            assert_eq!(actual.len(), 1);
+            assert_eq!(&expected, actual.first().unwrap());
+        }
+    }
+
+    #[test]
+    fn test_whitespace() {
+        let source = "           \n\n  +++  +\n+ +  ";
+        let expected = vec![
+            Token { typ: Plus, line: 2, column: 2 },
+            Token { typ: Plus, line: 2, column: 3 },
+            Token { typ: Plus, line: 2, column: 4 },
+            Token { typ: Plus, line: 2, column: 7 },
+            Token { typ: Plus, line: 3, column: 0 },
+            Token { typ: Plus, line: 3, column: 2 },
+        ];
+        let actual = Lexer::default().tokenize(source);
+
+        assert_eq!(expected, actual);
     }
 }

@@ -1,3 +1,4 @@
+#[derive(PartialEq, Debug)]
 pub enum TokenType {
     // Single-character
     LeftParen,
@@ -29,6 +30,7 @@ pub enum TokenType {
     Number(u32),
 }
 
+#[derive(PartialEq, Debug)]
 pub struct Token {
     pub typ: TokenType,
     pub line: usize,
