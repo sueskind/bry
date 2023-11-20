@@ -182,4 +182,32 @@ mod tests {
 
         assert_eq!(expected, actual);
     }
+
+    #[test]
+    fn test_keywords() {
+        let source = "def";
+        let expected = vec![
+            Token { typ: Def, line: 0, column: 0 },
+        ];
+        let actual = Lexer::default().tokenize(source);
+
+        assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn test_longer_lexemes() {
+        let source = "a a1 1a 0 verylongword verylongword6withnumber ";
+        let expected = vec![
+            Token { typ: Identifier(String::from("a")), line: 0, column: 0 },
+            Token { typ: Identifier(String::from("a1")), line: 0, column: 2 },
+            Token { typ: Number(1), line: 0, column: 5 },
+            Token { typ: Identifier(String::from("a")), line: 0, column: 6 },
+            Token { typ: Number(0), line: 0, column: 8 },
+            Token { typ: Identifier(String::from("verylongword")), line: 0, column: 10 },
+            Token { typ: Identifier(String::from("verylongword6withnumber")), line: 0, column: 23 },
+        ];
+        let actual = Lexer::default().tokenize(source);
+
+        assert_eq!(expected, actual);
+    }
 }
